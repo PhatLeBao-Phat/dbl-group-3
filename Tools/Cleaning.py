@@ -3,6 +3,7 @@ import json
 import numpy as np
 import sqlite3
 
+
 def remove_duplicated_text(df_data: pd.DataFrame) -> pd.DataFrame:
     """
     Function to remove duplicated datapoints that send by users but not airlines.
@@ -42,5 +43,25 @@ def remove_duplicated_text(df_data: pd.DataFrame) -> pd.DataFrame:
     df_tweets.drop(index=drop_lst, inplace=True)
     return df_tweets
 
+
 def reset_index(df_data: pd.DataFrame) -> pd.DataFrame:
+    """
+    reset the index when pull the non-name column from database
+    resulting from doing query like SELECT * FROM general_tweets
+    """
     return df_data.set_index('', inplace=True)
+
+
+def drop_invalid_reply(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    some tweets that are not a reply have non-NA value in one of 2 attributes in_reply_to_user_id or in_reply_to_status_id
+    therefore, we have to drop them 
+    """
+    try:
+        reply_user = pd.isna(df['in_reply_to_user_id'])
+        reply_status = pd.isna(df['in_reply_to_status_id'])
+        a = (reply_user == True) & (reply_status == False)
+        b = (reply_user == False) & (reply_status == True)
+        return df[np.invert(a | b)]
+    except KeyError:
+        print("missing one of 2 attributes in_reply_to_user_id or in_reply_to_status_id")
