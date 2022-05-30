@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import numpy as np
 import sqlite3
-
+from typing import List, Dict, Tuple 
 
 def remove_duplicated_text(df_data: pd.DataFrame) -> pd.DataFrame:
     """
@@ -65,3 +65,24 @@ def drop_invalid_reply(df: pd.DataFrame) -> pd.DataFrame:
         return df[np.invert(a | b)]
     except KeyError:
         print("missing one of 2 attributes in_reply_to_user_id or in_reply_to_status_id")
+
+
+#filter only one that have the at least one person in 2 persons is an airline
+def filter_non_airlines_conversation(lst : List[str], df : pd.DataFrame, airlines_id : Dict) -> pd.DataFrame:
+    """
+    Drop conversations that don't have at least 1 person is an airline account
+    
+    Parameters
+    ----------
+    lst : a list of string name of 2 attributes. For example: ['first_person_id', 'second_person_id']
+    df : DataFrame contains conversation
+    airlines_id : the dictionary of airlines. Example {'KLM' : 12231421}. We can import from definitions folder
+    
+    Returns
+    ----------
+    df : cleaned df
+    """
+    df_out = df.copy()
+    bol_lst = df_out[lst[0]].isin(airlines_id.values()) | (df_out[lst[1]].isin(airlines_id.values()))
+    df_out = df_out[bol_lst]
+    return df_out
