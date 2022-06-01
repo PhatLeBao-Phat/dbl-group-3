@@ -2,7 +2,9 @@ import pandas as pd
 import json
 import numpy as np
 import sqlite3
-from typing import List, Dict, Tuple 
+from typing import List, Dict, Tuple
+from definitions.airlines import airlines_id, airlines_name
+
 
 def remove_duplicated_text(df_data: pd.DataFrame) -> pd.DataFrame:
     """
@@ -67,17 +69,17 @@ def drop_invalid_reply(df: pd.DataFrame) -> pd.DataFrame:
         print("missing one of 2 attributes in_reply_to_user_id or in_reply_to_status_id")
 
 
-#filter only one that have the at least one person in 2 persons is an airline
-def filter_non_airlines_conversation(lst : List[str], df : pd.DataFrame, airlines_id : Dict) -> pd.DataFrame:
+# filter only one that have the at least one person in 2 persons is an airline
+def filter_non_airlines_conversation(lst: List[str], df: pd.DataFrame, airlines_id: Dict) -> pd.DataFrame:
     """
     Drop conversations that don't have at least 1 person is an airline account
-    
+
     Parameters
     ----------
     lst : a list of string name of 2 attributes. For example: ['first_person_id', 'second_person_id']
     df : DataFrame contains conversation
     airlines_id : the dictionary of airlines. Example {'KLM' : 12231421}. We can import from definitions folder
-    
+
     Returns
     ----------
     df : cleaned df
@@ -86,3 +88,89 @@ def filter_non_airlines_conversation(lst : List[str], df : pd.DataFrame, airline
     bol_lst = df_out[lst[0]].isin(airlines_id.values()) | (df_out[lst[1]].isin(airlines_id.values()))
     df_out = df_out[bol_lst]
     return df_out
+
+
+# build 2 new attributes to identify conversations below to which airlines
+def add_airlines_id(df: pd.DataFrame, lst: List[str]) -> pd.DataFrame:
+    """
+    add the name of the airlines and its id to the conversations
+
+    Parameters:
+    -----------
+    df : dataframe
+    lst : list name of 2 attributes
+
+    Returns:
+    ----------
+    df with an attribute indicating which airline and an attribute indicating that airline's id
+    """
+    df_out = df.copy()
+    airline_lst = []
+    airline_name_lst = []
+    for index, row in df_out.iterrows():
+        try:
+            airline_name_lst.append(airlines_name[row[lst[0]]])
+            airline_lst.append(row[lst[0]])
+        except:
+            airline_name_lst.append(airlines_name[row[lst[1]]])
+            airline_lst.append(row[lst[1]])
+    df_out['airline_id'] = airline_lst
+    df_out['airline_name'] = airline_name_lst
+
+    return df_out
+
+
+def change_type(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    change types in the dataframe queried from database back to the type you need
+    you can also doing .dtypes() function for each attributes
+    :param df: general tweet dataframe
+    :return: correct df
+    """
+    dct = {
+        'created_at': 'datetime64[ns, UTC]',
+        'id': 'float64',
+        'id_str': 'float64',
+        'text': 'object',
+        'display_text_range': 'object',
+        'source': 'object',
+        'truncated': 'float64',
+        'in_reply_to_status_id': 'float64',
+        'in_reply_to_status_id_str': 'float64',
+        'in_reply_to_user_id': 'float64',
+        'in_reply_to_user_id_str': 'float64',
+        'in_reply_to_screen_name': 'object',
+        'user': 'object',
+        'geo': 'object',
+        'coordinates': 'object',
+        'place': 'object',
+        'contributors': 'float64',
+        'is_quote_status': 'float64',
+        'quote_count': 'float64',
+        'reply_count': 'float64',
+        'retweet_count': 'float64',
+        'favorite_count': 'float64',
+        'entities': 'object',
+        'extended_entities': 'object',
+        'favorited': 'float64',
+        'retweeted': 'float64',
+        'possibly_sensitive': 'float64',
+        'filter_level': 'object',
+        'lang': 'object',
+        'timestamp_ms': 'datetime64[ns]',
+        'retweeted_status': 'object',
+        'extended_tweet': 'object',
+        'quoted_status_id': 'float64',
+        'quoted_status_id_str': 'float64',
+        'quoted_status': 'object',
+        'quoted_status_permalink': 'object',
+        'delete': 'object',
+        'user_id': 'int64'
+    }
+    for key in dct.keys():
+        try:
+            df = df.astype({key: dct[key]})
+        except:
+            pass
+
+    return df
