@@ -42,7 +42,7 @@ def preproc_text(text):
     text = re.sub(r'www.\S+','',text) # remove web link
     text = re.sub(r'#[A-Za-z0-9_]+','',text) # remove hashtag
     text = re.sub(r'[()!?]','',text) #remove exlamation marks
-    remove_list= 'Ã'+'Â'+'±'+'ã'+'¼'+'â'+'»'+'§'+ '¢‚¬¦'+ 'Å¸€¡³°Å¸€¡' + '¢‚¬Å¾'
+    remove_list= 'Ã'+'Â'+'±'+'ã'+'¼'+'â'+'»'+'§'+ '¢‚¬¦'+ 'Å¸€¡³°Å¸€¡' + '¢‚¬Å¾'+ 'â€'+ '˜'+'™'+'ðŸ'
     table = str.maketrans('', '', remove_list)
     text = text.translate(table)
     
