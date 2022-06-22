@@ -1,6 +1,7 @@
-"""I just combine all the functions wrote by Xiaoya and Julie here
-"""
+"""I just combine all the functions wrote by Xiaoya and Julie here. These are functions for preprocessing text for sentiment analysis"""
+
 import re
+
 """These were written by Xiaoya"""
 def cleaner(text):
     '''Remove URLs'''
@@ -34,7 +35,6 @@ def abbre(text4):
     return text4
     
 """These were written by Julie"""
-
 def preproc_text(text):
     text = re.sub(r'@[^\s]+','',text) #remove quote
     text = re.sub(r'RT[\s]+',' ',text) #remove retweet

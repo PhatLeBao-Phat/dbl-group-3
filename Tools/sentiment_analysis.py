@@ -1,3 +1,4 @@
+"""These are function to deal with sentiment analysis"""
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from scipy.special import softmax
 import numpy as np
