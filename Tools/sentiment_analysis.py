@@ -1,9 +1,11 @@
 """These are function to deal with sentiment analysis"""
+from regex import P
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from scipy.special import softmax
 import numpy as np
 from typing import Tuple, Dict, List
 from Tools.preprocessing import preprocessing_text
+from textblob import TextBlob
 
 # import roberta model
 roberta = 'cardiffnlp/twitter-roberta-base-sentiment'
@@ -33,3 +35,16 @@ def extract_sentiment_score(text: str) -> Tuple:
     a = np.array([-1, 0, 1])
     polarity = sum([i * j for i, j in zip(scores, a)])
     return l, polarity
+
+def get_label(text):
+    """
+    model Textblob 
+    """
+    p = TextBlob(preprocessing_text(text)).sentiment.polarity
+    if p > 0:
+        return 'Positive'
+    elif p < 0:
+        return 'Negative'
+    else:
+        return 'Neutral'
+
