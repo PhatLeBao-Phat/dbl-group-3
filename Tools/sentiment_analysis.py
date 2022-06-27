@@ -48,3 +48,8 @@ def get_label(text):
     else:
         return 'Neutral'
 
+def get_polarity(text);
+    """
+    model Textblob for polarity score 
+    """
+    return TextBlob(preprocessing_text(text)).sentiment.polarity
